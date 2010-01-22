@@ -10,26 +10,37 @@ import modelo.AbsCommand.COMMAND;
 import cgf.Constantes.Valores;
 import cgf.controle.Controle;
 import cgf.estado.EstadoJogo;
+import cgf.estado.IEstado;
 import cgf.estado.Zona;
+import cgf.rmi.IPlayer;
+import cgf.rmi.Player;
 
 public abstract class Jogo {
-	protected Controle controle;
+	// protected Controle controle;
 
 	protected Zona deck;
 
 	protected Map<Valores, Integer> valores;
 
-	protected Stack<EstadoJogo> mementos;
+	// String nome;
+
+	// private Map<String, IPlayer> players;
+
+	// TODO mudar pra IEstado
+	protected EstadoJogo estado;
+
+	protected Stack<IEstado> mementos;
 
 	protected abstract Zona defineDeck();
 
-	protected abstract List<Zona> defineZonas();
+	protected abstract List<Zona> defineZonas(List<IPlayer> players);
 
 	public Jogo(/* Controle controle/* EstadoJogo estado */) {
 		// new Controle(this, estado);
-		this.controle = Controle.getInstancia();
+		// this.controle = Controle.getInstancia();
 		valores = defineValores();
 		deck = defineDeck();
+		// players = new LinkedHashMap<String, IPlayer>();
 	}
 
 	/**
@@ -42,8 +53,7 @@ public abstract class Jogo {
 		List<Zona> origens = command.getOrigens();
 		Zona destino = command.getDestino();
 
-		EstadoJogo ej = controle.getEstadoJogo();
-		String nomePlayer = controle.getNomePlayer();
+		String nomePlayer = Controle.nomePlayer;
 		for (Zona origem : origens) {
 			if (origem == null) {
 				command.appendMsg("Zona origem nula\n");
@@ -60,7 +70,8 @@ public abstract class Jogo {
 			if (!destino.possuida(nomePlayer)) {
 				command.appendMsg("Zona destino não pertence ao player: " + destino.getName() + "\n");
 			}
-			if (!ej.getPlayerVez().equals(nomePlayer)) {
+			if (!estado.getPlayerVez().equals(nomePlayer)) {
+				if (!((Player) players.get(estado.getPlayerVez())).getNomePlayer().equals(nomePlayer);
 				command.appendMsg("Não é sua vez\n");
 			}
 		}
@@ -104,8 +115,6 @@ public abstract class Jogo {
 			 * validaMove(command); }
 			 */else if (COMMAND.DRAW == command.getCommand()) {
 				draw(command);
-			} else if (COMMAND.PASS == command.getCommand()) {
-				passaVez();
 			} else if (COMMAND.UNDO == command.getCommand()) {
 				// TODO passar command?
 				undo();
@@ -120,10 +129,9 @@ public abstract class Jogo {
 
 	private AbsCommand draw(AbsCommand command) {
 		// List<Zona> origens = command.getOrigens();
-		// Zona destino = command.getDestino();
+		Zona destino = command.getDestino();
 		List<Zona> origens = new ArrayList<Zona>();
 		origens.add(deck);
-		Zona destino = controle.getEstadoJogo().getZonaByName("Mao" + command.getNomePlayer());
 		for (int i = 0; i < command.getQnt(); i++) {
 			executa(new AbsCommand(COMMAND.MOVE, origens, destino));
 		}
@@ -148,7 +156,6 @@ public abstract class Jogo {
 				((Zona) origem.getParent()).reorganiza();
 			}
 		}
-		EstadoJogo estado = (EstadoJogo) controle.getEstadoJogo();
 		estado.setMoveu(true);
 		// Cria o memento apos o move
 		addMemento(estado);
@@ -156,11 +163,10 @@ public abstract class Jogo {
 		return command;
 	}
 
-	private final void passaVez() {
-		EstadoJogo estado = controle.getEstadoJogo();
-		estado.setPlayerVez(nextPlayer());
+	public final void passaVez(/*List<IPlayer> players*/) {
+		estado.setPlayerVez(nextPlayer(/*players*/));
 		estado.setMoveu(false);
-		setMemento(estado);
+		setMemento();
 		// EstadoJogo clone;
 		// try {
 		// clone = (EstadoJogo) estado.clone();
@@ -180,21 +186,26 @@ public abstract class Jogo {
 	 * 
 	 * @return
 	 */
-	private String nextPlayer() {
-		EstadoJogo estado = controle.getEstadoJogo();
-		String vez = null;
+	protected int nextPlayer(/* List<IPlayer> players */) {
+		// IPlayer next = null;
+		// String[] playerNames = estado.getPlayerNames();
+		// for (int i = 0; i < players.size(); i++) {
+		// if (estado.getPlayerVez().equals(players.get(i))) {
+		// if (i == players.size() - 1) {
+		// next = players.get(0);
+		// } else {
+		// next = players.get(i + 1);
+		// }
+		// }
+		// }
+		// return next;
+		
 		// Circular
-		String[] playerNames = estado.getPlayerNames();
-		for (int i = 0; i < playerNames.length; i++) {
-			if (estado.getPlayerVez().equals(playerNames[i])) {
-				if (i == playerNames.length - 1) {
-					vez = playerNames[0];
-				} else {
-					vez = playerNames[i + 1];
-				}
-			}
+		estado.setPlayerVez(estado.getPlayerVez() + 1);
+		if (estado.getPlayerVez() == estado.getnPlayers()) {
+			estado.setPlayerVez(0);
 		}
-		return vez;
+		return estado.getPlayerVez();
 	}
 
 	// public void setNomePlayer(String nome) {
@@ -218,11 +229,11 @@ public abstract class Jogo {
 
 	}
 
-	final EstadoJogo undo() {
+	final IEstado undo() {
 		return mementos.pop();
 	}
 
-	private final void addMemento(EstadoJogo estado) {
+	private final void addMemento(IEstado estado) {
 		/*
 		 * try { estado = (EstadoJogo) estado.clone(); } catch
 		 * (CloneNotSupportedException e) { // TODO Auto-generated catch block
@@ -231,9 +242,9 @@ public abstract class Jogo {
 		mementos.add(estado);
 	}
 
-	public final void setMemento(EstadoJogo estado) {
+	public final void setMemento() {
 		if (mementos == null) {
-			mementos = new Stack<EstadoJogo>();
+			mementos = new Stack<IEstado>();
 		} else {
 			mementos.clear();
 		}
@@ -247,17 +258,42 @@ public abstract class Jogo {
 	 * @param playerNames
 	 * 
 	 */
-	public final EstadoJogo configuraEstado(String[] playerNames) {
+	public final EstadoJogo configuraEstado(List<IPlayer> players) {
 		// Se atingiu numero de jogadores.
-		EstadoJogo estado = controle.getEstadoJogo();
-		estado.setPlayerVez(controle.getNomePlayer());
-		estado.setPlayerNames(playerNames);
+		estado.setPlayerVez(0);
+		// estado.setPlayerNames(playerNames);
 		// TODO nullpointer se nao definiu zonas
-		for (Zona zona : defineZonas()) {
-			controle.getEstadoJogo().add(zona);
+		for (Zona zona : defineZonas(players)) {
+			estado.add(zona);
 		}
 		// setNumPlayers(numPlayers);
 		// passaVez();
 		return estado;
+	}
+
+	public EstadoJogo getEstadoJogo() {
+		return estado;
+	}
+
+	public IEstado criaEstado(Class classEstado, Integer valor) {
+		try {
+			this.estado = (EstadoJogo) classEstado.newInstance();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.estado.setnPlayers(valor);
+		return this.estado;
+	}
+	
+	public vez(){
+		
+	}
+
+	public void setEstadoJogo(EstadoJogo estado) {
+		this.estado = estado;
 	}
 }

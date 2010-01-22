@@ -17,7 +17,7 @@ import cgf.estado.Zona;
 public class Mouse extends MouseInputAdapter implements Serializable {
 	private Point lastPressedPoint;
 
-	// private Zona dragZona;
+	private Controle controle;
 
 	private Zona mouseOverZona;
 
@@ -25,6 +25,10 @@ public class Mouse extends MouseInputAdapter implements Serializable {
 
 	public static List<Zona> selecionadas = new ArrayList<Zona>();
 
+	public Mouse(Controle controle) {
+		this.controle = controle;
+	}
+	
 	public void mouseClicked(MouseEvent e) {
 		System.out.println("mouseClicked");
 		Zona zona = (Zona) e.getSource();
@@ -58,7 +62,6 @@ public class Mouse extends MouseInputAdapter implements Serializable {
 	public void mousePressed(MouseEvent e) {
 		System.out.println("mousePressed");
 		lastPressedPoint = e.getPoint();
-		Controle controle = Controle.getInstancia();
 		// Joga o foco pra visao senao ela nao escuta keyListener
 		controle.getVisao().requestFocusInWindow();
 		// Zona pai = (Zona) dragZona.getParent();
@@ -68,7 +71,6 @@ public class Mouse extends MouseInputAdapter implements Serializable {
 	public void mouseReleased(MouseEvent e) {
 		System.out.println("mouseReleased");
 		if (isDragging) {
-			Controle controle = Controle.getInstancia();
 			controle.setNotificaPlayers(false);
 			AbsCommand command = controle.getJogo().executa(new AbsCommand(COMMAND.MOVE, selecionadas, mouseOverZona));
 			//AbsCommand command = commands.get(0);

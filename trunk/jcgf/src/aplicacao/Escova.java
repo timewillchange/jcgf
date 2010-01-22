@@ -1,5 +1,6 @@
 package aplicacao;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import cgf.estado.CartaBaralho;
 import cgf.estado.EstadoJogo;
 import cgf.estado.Zona;
 import cgf.estado.Zona.VISIBILIDADE;
+import cgf.rmi.IPlayer;
 
 public class Escova extends Jogo {
 	@Override
@@ -31,14 +33,21 @@ public class Escova extends Jogo {
 	}
 
 	@Override
-	protected List<Zona> defineZonas() {
+	protected List<Zona> defineZonas(List<IPlayer> players) {
 		List<Zona> zonas = new ArrayList<Zona>();
-		for (String playerName : controle.getEstadoJogo().getPlayerNames()) {
-			zonas.add(ZonaBuilder.getIntancia().buildHand(deck, playerName, 3));
-			zonas.add(ZonaBuilder.getIntancia().buildZona(deck, "Monte" + playerName, new String[] { playerName }, 0,
-					VISIBILIDADE.NINGUEM, false));
+		for (IPlayer player : players) {
+			String playerName;
+			try {
+				playerName = Controle.nomePlayer;
+				zonas.add(ZonaBuilder.getIntancia().buildHand(deck, player, 3));
+				zonas.add(ZonaBuilder.getIntancia().buildZona(deck, "Monte" + playerName, new IPlayer[] { player }, 0,
+						VISIBILIDADE.NINGUEM, false));
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		zonas.add(ZonaBuilder.getIntancia().buildMesa(deck, 4));
+		zonas.add(ZonaBuilder.getIntancia().buildMesa(deck, 4, players.toArray(new IPlayer[players.size()])));
 		zonas.add(deck);
 		return zonas;
 	}
@@ -61,7 +70,7 @@ public class Escova extends Jogo {
 		Zona destino = command.getDestino();
 		int soma = 0;
 		boolean so1Mao = false;
-		if (controle.getEstadoJogo().isMoveu()) {
+		if (estado.isMoveu()) {
 			command.appendMsg("Voce já jogou nesta rodada!\n");
 		}
 		if (destino.getName().equals("Mesa")) {
@@ -86,8 +95,7 @@ public class Escova extends Jogo {
 					command.appendMsg("Origem " + origem.getName() + "não é uma carta.\n");
 				}
 			}
-			if (soma != 15
-					&& controle.getEstadoJogo().getZonaByName("Monte" + controle.getNomePlayer()).equals(destino)) {
+			if (soma != 15 && estado.getZonaByName("Monte" + Controle.nomePlayer).equals(destino)) {
 				command.appendMsg("Esta jogada não soma 15.\n");
 			}
 		}

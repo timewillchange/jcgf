@@ -9,6 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.EventListener;
@@ -16,7 +17,6 @@ import java.util.List;
 
 import modelo.AbsCommand;
 import modelo.AbsCommand.COMMAND;
-
 import cgf.Constantes;
 import cgf.Util;
 import cgf.estado.EstadoJogo;
@@ -26,26 +26,32 @@ import cgf.rmi.IPlayer;
 public class ListenersVisao {
 	// TODO usar mouselistener ou mouse ?
 	private List<EventListener> myListenersList;
+	private Controle controle;
 
-	ListenersVisao() {
-		myListenersList = Arrays.asList(new EventListener[] { new Mouse(), Controle.getInstancia() });
+	ListenersVisao(Controle controle) {
+		this.controle = controle;
+		myListenersList = Arrays.asList(new EventListener[] { new Mouse(controle), controle });
 	}
 
 	void addPlayListener() {
-		final Controle controle = Controle.getInstancia();
 		controle.getVisao().getPlayDialog().getPlay().addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				// Controle player = controle;
 				String action = controle.getVisao().getPlayDialog().getBg().getSelection().getActionCommand();
 				String nome = controle.getVisao().getPlayDialog().getNome().getText();
-				controle.getPlayer().setNomePlayer(nome);
+				// controle.getPlayer().setNomePlayer(nome);
 				controle.getVisao().setTitle(nome);
+				controle.criaPlayer(nome);
 				if ("novo".equals(action)) {
+					controle.propertyChange(new PropertyChangeEvent(this, "nPlayers", null, (Integer) controle
+							.getVisao().getPlayDialog().getMinPlayer().getValue()));
 					// host = true;
-					controle.getPlayer().setNumPlayers(
-							(Integer) controle.getVisao().getPlayDialog().getMinPlayer().getValue());
-					controle.getPlayer().addObserver(nome, controle.getPlayer());
-					Util.cadastra(controle.getPlayer());
+					// controle.getPlayer().setNumPlayers(
+					// (Integer)
+					// controle.getVisao().getPlayDialog().getMinPlayer().getValue());
+					// controle.getPlayer().addObserver(nome,
+					// controle.getPlayer());
+					// Util.cadastra(controle.getPlayer());
 					controle.getVisao().setExtendedState(Frame.ICONIFIED);
 				} else if ("salvo".equals(action)) {
 					// host = true;
@@ -54,7 +60,12 @@ public class ListenersVisao {
 					try {
 						String ip = controle.getVisao().getPlayDialog().getIp().getText();
 						IPlayer server = Util.getRemotePlayer(ip, Constantes.REMOTE_PLAYER + "0");
-						server.update(nome, controle.getPlayer()/* ip */);
+						// Avisa o servidor que vai conectar.
+						server.update(nome, controle.getPlayer()/*
+																 * controle.getPlayer
+																 * ()
+																 *//* ip */);
+						// server.notifyObserver(nome);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -65,7 +76,6 @@ public class ListenersVisao {
 	}
 
 	void addKeybordListener() {
-		final Controle controle = Controle.getInstancia();
 		controle.getVisao().addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
 				if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
@@ -76,11 +86,10 @@ public class ListenersVisao {
 	}
 
 	void addVezListener() {
-		final Controle controle = Controle.getInstancia();
 		controle.getVisao().getButtonVez().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("passou");
-				controle.getJogo().executa(new AbsCommand(COMMAND.PASS));
+				controle.getJogo().passaVez();
 				controle.broadcastEstado();
 			}
 		});
@@ -121,7 +130,6 @@ public class ListenersVisao {
 			}
 		}
 	}
-	
 
 	final void preparaEstado(EstadoJogo estado, boolean compress) {
 		// if (compress) {
@@ -148,8 +156,6 @@ public class ListenersVisao {
 	private final void preparaEstadoRecursivo(Container comp, boolean compress) {
 		if (comp instanceof Zona) {
 			Zona zona = (Zona) comp;
-			// TODO fica aki fora do if?
-			zona.setaFoto();
 			if (compress) {
 				// Apaga a foto para reduzir o tamanho seriazilado da zona.
 				// TODO Com isso as Cartas nao ficam visiveis, nao adianta
@@ -158,6 +164,8 @@ public class ListenersVisao {
 				removeMouseListeners(zona);
 				Zona.criaBorda(zona, false);
 			} else {
+				// TODO fica aki fora do if?
+				zona.setaFoto(Controle.nomePlayer);
 				// if (zona instanceof CartaBaralho)
 				{
 					addMouseListeners(zona);

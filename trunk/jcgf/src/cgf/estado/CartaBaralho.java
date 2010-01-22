@@ -9,7 +9,6 @@ import javax.swing.ImageIcon;
 import cgf.Constantes;
 import cgf.Constantes.Naipes;
 import cgf.Constantes.Valores;
-import cgf.controle.Controle;
 import cgf.visao.GUIPreferencias;
 
 public class CartaBaralho extends Zona {
@@ -82,17 +81,17 @@ public class CartaBaralho extends Zona {
 		this.getParent().add(comp, index);
 		return comp;
 	}
-	
+
 	/**
 	 * TODO aki mesmo? Seta a foto da carta de acordo com visibilidade da mesma.
 	 */
-	public void setaFoto() {
-		//if (zona instanceof CartaBaralho)
+	public void setaFoto(String nomePlayer) {
+		// if (zona instanceof CartaBaralho)
 		{
-			//CartaBaralho carta = (CartaBaralho) zona;
+			// CartaBaralho carta = (CartaBaralho) zona;
 			CartaBaralho carta = this;
 			String foto = "";
-			if (!carta.isVisivelPossui(Controle.getInstancia().getNomePlayer())) {
+			if (!carta.isVisivelPossui(nomePlayer)) {
 				// Se a carta nao é visivel por esse player sua foto sera o
 				// virada.
 				// g.drawImage(Constantes.DECK_BACK, 0, 0, null);

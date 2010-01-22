@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 import cgf.estado.EstadoJogo;
 
 public class Visao extends JFrame {
-	private EstadoJogo jContentPane = null;
+	// private EstadoJogo jContentPane = null;
 
 	private PlayDialog playDialog;
 
