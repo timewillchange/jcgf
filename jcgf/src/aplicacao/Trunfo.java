@@ -1,5 +1,6 @@
 package aplicacao;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import cgf.controle.Controle;
 import cgf.estado.EstadoJogo;
 import cgf.estado.Zona;
 import cgf.estado.Zona.VISIBILIDADE;
+import cgf.rmi.IPlayer;
 
 public class Trunfo extends Jogo {
 	@Override
@@ -21,39 +23,39 @@ public class Trunfo extends Jogo {
 	}
 
 	@Override
-	protected List<Zona> defineZonas() {
+	protected List<Zona> defineZonas(List<IPlayer> players) {
 		List<Zona> zonas = new ArrayList<Zona>();
-		for (String playerName : controle.getEstadoJogo().getPlayerNames()) {
-			zonas.add(ZonaBuilder.getIntancia().buildHand(deck, playerName, 5));
-			zonas.add(ZonaBuilder.getIntancia().buildZona(deck, "Monte" + playerName, new String[] { playerName }, 0,
-					VISIBILIDADE.PRIVADA, false));
+		for (IPlayer player : players) {
+			String playerName;
+			try {
+				playerName = Controle.nomePlayer;
+				zonas.add(ZonaBuilder.getIntancia().buildHand(deck, player, 5));
+				zonas.add(ZonaBuilder.getIntancia().buildZona(deck, "Monte" + playerName, new IPlayer[] { player }, 0,
+						VISIBILIDADE.PRIVADA, false));
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		zonas.add(ZonaBuilder.getIntancia().buildMesa(deck, 0));
+		zonas.add(ZonaBuilder.getIntancia().buildMesa(deck, 0, players.toArray(new IPlayer[players.size()])));
 		zonas.add(ZonaBuilder.getIntancia().buildZona(deck, "Trunfo", null, 1, VISIBILIDADE.PUBLICA, false));
 		zonas.add(deck);
 		return zonas;
 	}
 
 	@Override
-	protected AbsCommand antesExecuta(AbsCommand command) {
-		COMMAND cmd = command.getCommand();
-		// TODO pass???
-		if (COMMAND.PASS == cmd) {
-			Zona mao = controle.getEstadoJogo().getZonaByName("Mao" + controle.getNomePlayer());
-			if (mao.lenght() == 0) {
-				for (String nomePlayer : controle.getEstadoJogo().getPlayerNames()) {
-					new AbsCommand(COMMAND.DRAW, nomePlayer, 3);
-				}
+	protected int nextPlayer() {
+		Zona mao = estado.getZonaByName("Mao" + controle.getNomePlayer());
+		if (mao.lenght() == 0) {
+			for (String nomePlayer : estado.getPlayerNames()) {
+				new AbsCommand(COMMAND.DRAW, mao, 3);
 			}
 		}
-		// List<AbsCommand> comandos = new ArrayList<AbsCommand>();
-		// comandos.add(command);
-		return command;
 	}
 
 	@Override
 	protected AbsCommand aposValidaMove(AbsCommand command) {
-		List<Zona> origens = command.getOrigens();		
+		List<Zona> origens = command.getOrigens();
 		if (origens.size() != 1) {
 			command.appendMsg("Origem deve ser uma única carta da mão.\n");
 		}

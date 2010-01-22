@@ -1,5 +1,6 @@
 package cgf;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,9 +10,9 @@ import cgf.Constantes.Naipes;
 import cgf.Constantes.Valores;
 import cgf.controle.Controle;
 import cgf.estado.CartaBaralho;
-import cgf.estado.EstadoJogo;
 import cgf.estado.Zona;
 import cgf.estado.Zona.VISIBILIDADE;
+import cgf.rmi.IPlayer;
 
 /**
  * Constrói zonas com cartas prédefinidas ou aleatórias.
@@ -52,22 +53,19 @@ public class ZonaBuilder {
 	 *            Define quem serão os donos e por quem a zona sera visivel.
 	 * @return
 	 */
-	public final Zona buildZona(Zona origem, String nome, String[] donos, int qntCartas, VISIBILIDADE visivelPor,
+	public final Zona buildZona(Zona origem, String nome, IPlayer[] donos, int qntCartas, VISIBILIDADE visivelPor,
 			boolean movivel) {
 		Zona zona = null;
-		EstadoJogo estado = Controle.getInstancia().getEstadoJogo();
-		if (estado != null) {
-			zona = new Zona(nome, donos, visivelPor, movivel);
-			// zona.setDonos(donos);
-			for (int i = 0; i < qntCartas; i++) {
-				zona.add(origem.getComponent(0));
-			}
-			/*
-			 * switch (tipoZona) { case PROTEGIDA: break; case PRIVADA:
-			 * zona.setDonos(new String[] { estado.playerVez }); break; case
-			 * PUBLICA: zona.setDonos(estado.getPlayerNames()); break; }
-			 */
+		zona = new Zona(nome, donos, visivelPor, movivel);
+		// zona.setDonos(donos);
+		for (int i = 0; i < qntCartas; i++) {
+			zona.add(origem.getComponent(0));
 		}
+		/*
+		 * switch (tipoZona) { case PROTEGIDA: break; case PRIVADA:
+		 * zona.setDonos(new String[] { estado.playerVez }); break; case
+		 * PUBLICA: zona.setDonos(estado.getPlayerNames()); break; }
+		 */
 		return zona;
 	}
 
@@ -105,12 +103,12 @@ public class ZonaBuilder {
 		return monte;
 	}
 
-	public final Zona buildHand(Zona origem, String nome, int qntCartas) {
-		return buildZona(origem, "Mao" + nome, new String[] { nome }, qntCartas, VISIBILIDADE.PRIVADA, false);
+	public final Zona buildHand(Zona origem, IPlayer dono, int qntCartas) throws RemoteException {
+		return buildZona(origem, "Mao" + Controle.nomePlayer, new IPlayer[] { dono }, qntCartas, VISIBILIDADE.PRIVADA,
+				false);
 	}
 
-	public final Zona buildMesa(Zona origem, int qntCartas) {
-		return buildZona(origem, "Mesa", Controle.getInstancia().getEstadoJogo().getPlayerNames(), qntCartas, VISIBILIDADE.PUBLICA,
-				false);
+	public final Zona buildMesa(Zona origem, int qntCartas, IPlayer[] donos) {
+		return buildZona(origem, "Mesa", donos, qntCartas, VISIBILIDADE.PUBLICA, false);
 	}
 }

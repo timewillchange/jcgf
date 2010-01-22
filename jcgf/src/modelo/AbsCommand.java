@@ -6,21 +6,13 @@ import cgf.estado.Zona;
 
 public/* abstract */class AbsCommand {
 	public static enum COMMAND {
-		SELECT, UNSELECT, FLIP, MOVE, UNDO, DRAW, /*VALIDATE,*/ PASS;
+		SELECT, UNSELECT, FLIP, MOVE, UNDO, DRAW, /*VALIDATE, PASS*/;
 	}
 
 	private COMMAND command;
 	private List<Zona> origens;
 	private Zona destino;
 	private StringBuffer msg;
-	private String nomePlayer;
-	public String getNomePlayer() {
-		return nomePlayer;
-	}
-
-	public void setNomePlayer(String player) {
-		this.nomePlayer = player;
-	}
 
 	private int qnt;
 
@@ -52,9 +44,9 @@ public/* abstract */class AbsCommand {
 		this.command = command;
 	}
 
-	public AbsCommand(COMMAND command, String nomePlayer, int i) {
+	public AbsCommand(COMMAND command, Zona destino, int i) {
 		this.command = command;
-		this.nomePlayer = nomePlayer;
+		this.destino = destino;
 		this.qnt = i;
 	}
 

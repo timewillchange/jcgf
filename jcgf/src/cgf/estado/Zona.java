@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
 
+import cgf.rmi.IPlayer;
 import cgf.visao.GUIPreferencias;
 
 public class Zona extends JLabel implements Cloneable {
@@ -23,9 +24,9 @@ public class Zona extends JLabel implements Cloneable {
 
 	protected VISIBILIDADE visivelPor;
 
-	protected List<String> donos;
+	protected List<IPlayer> donos;
 
-	public List<String> getDonos() {
+	public List<IPlayer> getDonos() {
 		return donos;
 	}
 
@@ -35,7 +36,7 @@ public class Zona extends JLabel implements Cloneable {
 
 	// TODO fazer as zonas terem props como minDistX e minDistY passadas no
 	// contrutor
-	public Zona(String nome, String[] donos, /* Zona conteudo, */VISIBILIDADE visivelPor, boolean movivel) {
+	public Zona(String nome, IPlayer[] donos, /* Zona conteudo, */VISIBILIDADE visivelPor, boolean movivel) {
 		if (donos != null) {
 			this.donos = Arrays.asList(donos);
 		}
@@ -126,11 +127,11 @@ public class Zona extends JLabel implements Cloneable {
 	 * public Set<String> getVisivelPor() { return visivelPor; }
 	 */
 
-	public void setDonos(List<String> donos) {
+	public void setDonos(List<IPlayer> donos) {
 		this.donos = donos;
 	}
 
-	public void setDonos(String[] donos) {
+	public void setDonos(IPlayer[] donos) {
 		this.donos = Arrays.asList(donos);
 	}
 
@@ -184,10 +185,6 @@ public class Zona extends JLabel implements Cloneable {
 		g2.drawImage(bi, op, 0, 0);
 	}
 
-	public void setaFoto() {
-
-	}
-
 	// TODO aki? Melhorar isso
 	public Zona getZonaPrimaria(Zona z) {
 		if (z.getParent() instanceof Zona) {
@@ -208,5 +205,10 @@ public class Zona extends JLabel implements Cloneable {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	public void setaFoto(String nomePlayer) {
+		// TODO Auto-generated method stub
+		
 	}
 }

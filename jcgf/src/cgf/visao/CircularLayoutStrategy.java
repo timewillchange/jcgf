@@ -150,7 +150,6 @@ public class CircularLayoutStrategy implements ILayoutStrategy, LayoutManager2, 
 		comptable.remove(comp);
 	}
 
-	@Override
 	public void reorganiza(IPlayer modelo) {
 		// TODO ninguem chama
 	}

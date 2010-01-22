@@ -16,11 +16,21 @@ import cgf.visao.ILayoutStrategy;
 public class EstadoJogo extends JPanel implements ILayoutStrategy, IEstado, Cloneable {
 	// OBS: Só pra lembrar variaveis static obviamente não são serializadas!
 	// TODO String ou Player? Deve ser salvo!
-	protected String playerVez;
-
+	// protected String playerVez;
+	protected int pVez;
 	protected boolean moveu = false;
 
-	protected String[] playerNames;
+	protected int nPlayers;
+
+	public int getnPlayers() {
+		return nPlayers;
+	}
+
+	public void setnPlayers(int nPlayers) {
+		this.nPlayers = nPlayers;
+	}
+
+	// protected String[] playerNames;
 
 	protected int nRound;
 
@@ -39,9 +49,9 @@ public class EstadoJogo extends JPanel implements ILayoutStrategy, IEstado, Clon
 		setMinimumSize(new Dimension(400, 400));
 	}
 
-	public void setPlayerNames(String[] playerNames) {
-		this.playerNames = playerNames;
-	}
+	// public void setPlayerNames(String[] playerNames) {
+	// this.playerNames = playerNames;
+	// }
 
 	public void printEstado() {
 		for (Component zona : getComponents()) {
@@ -49,14 +59,14 @@ public class EstadoJogo extends JPanel implements ILayoutStrategy, IEstado, Clon
 		}
 	}
 
-	public String[] getPlayerNames() {
-		return playerNames;
-	}
+	// public String[] getPlayerNames() {
+	// return playerNames;
+	// }
 
-	public void setPlayerVez(String playerVez) {
-		String old = this.playerVez;
-		this.playerVez = playerVez;
-		firePropertyChange("playerVez", old, playerVez);
+	public void setPlayerVez(int pVez) {
+		int old = this.pVez;
+		this.pVez = pVez;
+		firePropertyChange("playerVez", old, pVez);
 	}
 
 	public final Zona getZonaByName(String nomeZona) {
@@ -89,8 +99,8 @@ public class EstadoJogo extends JPanel implements ILayoutStrategy, IEstado, Clon
 		return super.clone();
 	}
 
-	public String getPlayerVez() {
-		return playerVez;
+	public int getPlayerVez() {
+		return pVez;
 	}
 
 	public boolean isMoveu() {
@@ -110,8 +120,8 @@ public class EstadoJogo extends JPanel implements ILayoutStrategy, IEstado, Clon
 		return super.getLayout();
 	}
 
-	@Override
 	public void reorganiza(IPlayer modelo) {
 		// TODO ninguem chama
+
 	}
 }
