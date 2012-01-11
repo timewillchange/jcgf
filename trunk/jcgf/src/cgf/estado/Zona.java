@@ -24,9 +24,9 @@ public class Zona extends JLabel implements Cloneable {
 
 	protected VISIBILIDADE visivelPor;
 
-	protected List<IPlayer> donos;
+	protected List<Integer> donos;
 
-	public List<IPlayer> getDonos() {
+	public List<Integer> getDonos() {
 		return donos;
 	}
 
@@ -36,7 +36,7 @@ public class Zona extends JLabel implements Cloneable {
 
 	// TODO fazer as zonas terem props como minDistX e minDistY passadas no
 	// contrutor
-	public Zona(String nome, IPlayer[] donos, /* Zona conteudo, */VISIBILIDADE visivelPor, boolean movivel) {
+	public Zona(String nome, Integer[] donos, /* Zona conteudo, */VISIBILIDADE visivelPor, boolean movivel) {
 		if (donos != null) {
 			this.donos = Arrays.asList(donos);
 		}
@@ -85,7 +85,7 @@ public class Zona extends JLabel implements Cloneable {
 	public Component add(Component comp, int index) {
 		if (!(comp instanceof Zona)) {
 			// Nao deve fazer nada
-			System.err.println("Uma zona só pode ter filhos do tipo Zona!");
+			System.err.println("Uma zona sï¿½ pode ter filhos do tipo Zona!");
 			return null;
 		}
 		// Container antesMove = comp.getParent();
@@ -127,11 +127,11 @@ public class Zona extends JLabel implements Cloneable {
 	 * public Set<String> getVisivelPor() { return visivelPor; }
 	 */
 
-	public void setDonos(List<IPlayer> donos) {
+	public void setDonos(List<Integer> donos) {
 		this.donos = donos;
 	}
 
-	public void setDonos(IPlayer[] donos) {
+	public void setDonos(Integer[] donos) {
 		this.donos = Arrays.asList(donos);
 	}
 
@@ -166,16 +166,16 @@ public class Zona extends JLabel implements Cloneable {
 	// this.tipoZona = tipoZona;
 	// }
 	//
-	public boolean isVisivelPossui(String pName) {
+	public boolean isVisivelPossui(int id) {
 		if (visivelPor == VISIBILIDADE.PUBLICA
-				|| (visivelPor != VISIBILIDADE.NINGUEM && donos != null && donos.contains(pName))) {
+				|| (visivelPor != VISIBILIDADE.NINGUEM && donos != null && donos.contains(id))) {
 			return true;
 		}
 		return false;
 	}
 
-	public boolean possuida(String pName) {
-		return donos != null && donos.contains(pName);
+	public boolean possuida(int id) {
+		return donos != null && donos.contains(id);
 	}
 
 	private void negative(Graphics g, Zona zona) {
@@ -207,7 +207,7 @@ public class Zona extends JLabel implements Cloneable {
 		return getName();
 	}
 
-	public void setaFoto(String nomePlayer) {
+	public void setaFoto(int id) {
 		// TODO Auto-generated method stub
 		
 	}

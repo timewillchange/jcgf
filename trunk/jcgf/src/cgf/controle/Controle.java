@@ -3,10 +3,9 @@ package cgf.controle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.swing.JOptionPane;
+import java.util.Map;
 
 import modelo.Jogo;
 import cgf.estado.EstadoJogo;
@@ -31,7 +30,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 
 	private IPlayer player;
 
-	private List<IPlayer> players;
+	private Map<String, IPlayer> players;
 
 	private Class<E> classEstado;
 
@@ -42,7 +41,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 			criaVisao(estado);
 			criaJogo(jogo);
 			// player = new Player();
-			players = new ArrayList<IPlayer>();
+			players = new HashMap<String, IPlayer>();
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,7 +65,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 	}
 
 	/**
-	 * Escuta alterações no estado de jogo e manda executar as notificações
+	 * Escuta alteraï¿½ï¿½es no estado de jogo e manda executar as notificaï¿½ï¿½es
 	 * remotas.
 	 */
 	public final void propertyChange(PropertyChangeEvent evt) {
@@ -75,7 +74,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 		if ("nPlayers".equals(propName)) {
 			visao.setEstadoJogo((EstadoJogo) jogo.criaEstado(classEstado, (Integer) valor));
 		} else if ("ancestor".equals(propName)) {
-			// Quando ocorre modificação de estado pela visao.
+			// Quando ocorre modificaï¿½ï¿½o de estado pela visao.
 			if (notificaPlayers) {
 				if (evt.getOldValue() != null && evt.getNewValue() != null) {
 					// EstadoJogo estado = getEstadoJogo();
@@ -85,7 +84,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 				}
 			}
 		} else if (valor instanceof IPlayer) {
-			players.add((IPlayer) valor);
+			players.put((String) evt.getSource(), (IPlayer) valor);
 			if (jogo.getEstadoJogo().getnPlayers() == players.size()) {
 				// Jogo vai comecar
 				setNotificaPlayers(false);
@@ -96,10 +95,10 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 				broadcast(estado);
 			}
 		} else if (valor instanceof List) {
-			players = (List) valor;
+			players = (Map) valor;
 		} else if (valor instanceof EstadoJogo) {
 			EstadoJogo estado = (EstadoJogo) valor;
-			boolean minhaVez = ((Player) players.get(estado.getPlayerVez())).getNomePlayer().equals(nomePlayer);
+			boolean minhaVez = estado.getPlayerVez() == ((Player) player).getId();
 			if (!evt.getSource().equals(nomePlayer)) {
 				listenersVisao.preparaEstado(estado, false);
 				jogo.setMemento();
@@ -108,7 +107,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 				// jogo.aposReceberEstadoRemoto();
 				// Arruma visao
 				if (minhaVez) {
-					JOptionPane.showMessageDialog(visao, "É sua vez!");
+					// JOptionPane.showMessageDialog(visao, "ï¿½ sua vez!");
 					// jogo.executa(new AbsCommand(COMMAND.PASS, null, null));
 				}
 			}
@@ -144,7 +143,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 	// // jogo.aposReceberEstadoRemoto();
 	// // Arruma visao
 	// if (minhaVez) {
-	// JOptionPane.showMessageDialog(visao, "É sua vez!");
+	// JOptionPane.showMessageDialog(visao, "ï¿½ sua vez!");
 	// jogo.executa(new AbsCommand(COMMAND.PASS, null, null));
 	// }
 	// }
@@ -188,7 +187,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 			player = new Player(nome, this);
 			nomePlayer = nome;
 			// player.addObserver(nome, player);
-			addPlayer(player);
+			addPlayer(nome, player);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -196,9 +195,9 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 		// getVisao().getEstadoJogo().setNumPlayers(numPlayers);
 	}
 
-	private final void addPlayer(IPlayer player) {
-		if (!players.contains(player)) {
-			players.add(player);
+	private final void addPlayer(String nome, IPlayer player) {
+		if (!players.values().contains(player)) {
+			players.put(nome, player);
 		}
 		// setChanged(true);
 		broadcast(players);
@@ -213,7 +212,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 		// return;
 		// setChanged(false);
 		// }
-		for (IPlayer p : players) {
+		for (IPlayer p : players.values()) {
 			try {
 				// if (!((Player) p).nomePlayer.equals(nomePlayer))
 				{
@@ -231,7 +230,7 @@ public class Controle<J extends Jogo, E extends EstadoJogo> implements PropertyC
 		return player;
 	}
 
-	public List<IPlayer> getPlayers() {
+	public Map<String, IPlayer> getPlayers() {
 		return players;
 	}
 	//

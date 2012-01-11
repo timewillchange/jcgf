@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import modelo.AbsCommand;
-import modelo.Jogo;
 import modelo.AbsCommand.COMMAND;
+import modelo.Jogo;
 import cgf.Constantes;
-import cgf.ZonaBuilder;
 import cgf.Constantes.Valores;
+import cgf.ZonaBuilder;
 import cgf.controle.Controle;
 import cgf.estado.CartaBaralho;
 import cgf.estado.EstadoJogo;
@@ -33,21 +33,21 @@ public class Escova extends Jogo {
 	}
 
 	@Override
-	protected List<Zona> defineZonas(List<IPlayer> players) {
+	protected List<Zona> defineZonas(Map<String, IPlayer> players) {
 		List<Zona> zonas = new ArrayList<Zona>();
-		for (IPlayer player : players) {
-			String playerName;
+		int i = 0;
+		for (String playerName : players.keySet()) {
 			try {
-				playerName = Controle.nomePlayer;
-				zonas.add(ZonaBuilder.getIntancia().buildHand(deck, player, 3));
-				zonas.add(ZonaBuilder.getIntancia().buildZona(deck, "Monte" + playerName, new IPlayer[] { player }, 0,
+				zonas.add(ZonaBuilder.getIntancia().buildHand(deck, playerName, i, 3));
+				zonas.add(ZonaBuilder.getIntancia().buildZona(deck, "Monte" + playerName, new Integer[] { i }, 0,
 						VISIBILIDADE.NINGUEM, false));
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			i++;
 		}
-		zonas.add(ZonaBuilder.getIntancia().buildMesa(deck, 4, players.toArray(new IPlayer[players.size()])));
+		zonas.add(ZonaBuilder.getIntancia().buildMesa(deck, 4, new Integer[] { 0, 1 }));
 		zonas.add(deck);
 		return zonas;
 	}
@@ -71,33 +71,35 @@ public class Escova extends Jogo {
 		int soma = 0;
 		boolean so1Mao = false;
 		if (estado.isMoveu()) {
-			command.appendMsg("Voce j· jogou nesta rodada!\n");
+			command.appendMsg("Voce j√° jogou nesta rodada!\n");
 		}
 		if (destino.getName().equals("Mesa")) {
 			if (!(origens.get(0) instanceof CartaBaralho)) {
 				command.appendMsg("Origem deve ser uma carta.\n");
 			}
 			if (origens.size() != 1) {
-				command.appendMsg("SÛ pode por uma carta na mesa.\n");
+				command.appendMsg("S√≥ pode por uma carta na mesa.\n");
 			}
-		} else {
+		} else if (("Monte" + Controle.nomePlayer).equals(destino.getName())) {
 			for (Zona origem : origens) {
 				if (origem instanceof CartaBaralho) {
 					CartaBaralho carta = (CartaBaralho) origem;
 					soma += valores.get(carta.getValor());
 					if (carta.getParent().getName().startsWith("Mao")) {
 						if (so1Mao == true) {
-							command.appendMsg("SÛ vale usar uma carta da m„o.\n");
+							command.appendMsg("S√≥ vale usar uma carta da m√£o.\n");
 						}
 						so1Mao = true;
 					}
 				} else {
-					command.appendMsg("Origem " + origem.getName() + "n„o È uma carta.\n");
+					command.appendMsg("Origem " + origem.getName() + "n√£o √© uma carta.\n");
 				}
 			}
-			if (soma != 15 && estado.getZonaByName("Monte" + Controle.nomePlayer).equals(destino)) {
-				command.appendMsg("Esta jogada n„o soma 15.\n");
+			if (soma != 15) {
+				command.appendMsg("Esta jogada n√£o soma 15.\n");
 			}
+		} else {
+			command.appendMsg("Zona destino inv√°lida.\n");
 		}
 		return command;
 	}

@@ -23,7 +23,7 @@ public class Trunfo extends Jogo {
 	}
 
 	@Override
-	protected List<Zona> defineZonas(List<IPlayer> players) {
+	protected List<Zona> defineZonas(Map<String, IPlayer> players) {
 		List<Zona> zonas = new ArrayList<Zona>();
 		for (IPlayer player : players) {
 			String playerName;
@@ -57,15 +57,15 @@ public class Trunfo extends Jogo {
 	protected AbsCommand aposValidaMove(AbsCommand command) {
 		List<Zona> origens = command.getOrigens();
 		if (origens.size() != 1) {
-			command.appendMsg("Origem deve ser uma única carta da mão.\n");
+			command.appendMsg("Origem deve ser uma ï¿½nica carta da mï¿½o.\n");
 		}
 		Zona o = origens.get(0);
 		if (o.getZonaPrimaria(o).getName().startsWith("Trunfo")) {
-			command.appendMsg("Origem não pode pertencer a zona do Trunfo.\n");
+			command.appendMsg("Origem nï¿½o pode pertencer a zona do Trunfo.\n");
 		}
 		Zona destino = command.getDestino();
 		if (!destino.getZonaPrimaria(destino).getName().startsWith("Mesa")) {
-			command.appendMsg("Destino inválido.\n");
+			command.appendMsg("Destino invï¿½lido.\n");
 		}
 		return command;
 	}

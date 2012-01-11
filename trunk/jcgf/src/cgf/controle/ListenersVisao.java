@@ -15,13 +15,12 @@ import java.util.Arrays;
 import java.util.EventListener;
 import java.util.List;
 
-import modelo.AbsCommand;
-import modelo.AbsCommand.COMMAND;
 import cgf.Constantes;
 import cgf.Util;
 import cgf.estado.EstadoJogo;
 import cgf.estado.Zona;
 import cgf.rmi.IPlayer;
+import cgf.rmi.Player;
 
 public class ListenersVisao {
 	// TODO usar mouselistener ou mouse ?
@@ -62,8 +61,8 @@ public class ListenersVisao {
 						IPlayer server = Util.getRemotePlayer(ip, Constantes.REMOTE_PLAYER + "0");
 						// Avisa o servidor que vai conectar.
 						server.update(nome, controle.getPlayer()/*
-																 * controle.getPlayer
-																 * ()
+																 * controle.
+																 * getPlayer ()
 																 *//* ip */);
 						// server.notifyObserver(nome);
 					} catch (Exception ex) {
@@ -97,11 +96,11 @@ public class ListenersVisao {
 
 	void addMouseListeners(Zona zona) {
 		/*
-		 * Recoloca os listeners pois eles se perdem na serialização.
+		 * Recoloca os listeners pois eles se perdem na serializaï¿½ï¿½o.
 		 */
 		for (EventListener listener : myListenersList) {
 			/*
-			 * TODO Mangue para evitar problema de duplicação de listeners.
+			 * TODO Mangue para evitar problema de duplicaï¿½ï¿½o de listeners.
 			 */
 			if (listener instanceof MouseListener && !Arrays.asList(zona.getMouseListeners()).contains(listener)) {
 				zona.addMouseListener((MouseListener) listener);
@@ -148,7 +147,7 @@ public class ListenersVisao {
 
 	/**
 	 * Seta a foto e TODO Coloca os mouse listeners em todas as cartas do
-	 * estado. Listeners parecem ser transients, nao serializáveis, ao envia-los
+	 * estado. Listeners parecem ser transients, nao serializï¿½veis, ao envia-los
 	 * perde-se os listeners das cartas.
 	 * 
 	 * @param comp
@@ -165,7 +164,7 @@ public class ListenersVisao {
 				Zona.criaBorda(zona, false);
 			} else {
 				// TODO fica aki fora do if?
-				zona.setaFoto(Controle.nomePlayer);
+				zona.setaFoto(((Player) controle.getPlayer()).getId());
 				// if (zona instanceof CartaBaralho)
 				{
 					addMouseListeners(zona);
