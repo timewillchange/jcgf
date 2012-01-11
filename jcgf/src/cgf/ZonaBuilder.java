@@ -13,9 +13,10 @@ import cgf.estado.CartaBaralho;
 import cgf.estado.Zona;
 import cgf.estado.Zona.VISIBILIDADE;
 import cgf.rmi.IPlayer;
+import cgf.rmi.Player;
 
 /**
- * Constrói zonas com cartas prédefinidas ou aleatórias.
+ * Constrï¿½i zonas com cartas prï¿½definidas ou aleatï¿½rias.
  * 
  * @author 99689650068
  */
@@ -39,21 +40,21 @@ public class ZonaBuilder {
 	}
 
 	/**
-	 * Cria uma zona com "qntCartas" cartas caso o estado passado não seja nulo
+	 * Cria uma zona com "qntCartas" cartas caso o estado passado nï¿½o seja nulo
 	 * e possua um deck.
 	 * 
 	 * @param donos
 	 *            Donos da zona criada.
 	 * @param estado
-	 *            Estado que possui o deck fonte de onde serão tiradas as cartas
-	 *            para dar conteudo á zona criada.
+	 *            Estado que possui o deck fonte de onde serï¿½o tiradas as cartas
+	 *            para dar conteudo ï¿½ zona criada.
 	 * @param qntCartas
 	 *            Quantidade de cartas tiradas da fonte.
 	 * @param tipoZona
-	 *            Define quem serão os donos e por quem a zona sera visivel.
+	 *            Define quem serï¿½o os donos e por quem a zona sera visivel.
 	 * @return
 	 */
-	public final Zona buildZona(Zona origem, String nome, IPlayer[] donos, int qntCartas, VISIBILIDADE visivelPor,
+	public final Zona buildZona(Zona origem, String nome, Integer[] donos, int qntCartas, VISIBILIDADE visivelPor,
 			boolean movivel) {
 		Zona zona = null;
 		zona = new Zona(nome, donos, visivelPor, movivel);
@@ -103,12 +104,12 @@ public class ZonaBuilder {
 		return monte;
 	}
 
-	public final Zona buildHand(Zona origem, IPlayer dono, int qntCartas) throws RemoteException {
-		return buildZona(origem, "Mao" + Controle.nomePlayer, new IPlayer[] { dono }, qntCartas, VISIBILIDADE.PRIVADA,
-				false);
+	public final Zona buildHand(Zona origem, String pname, int dono, int qntCartas) throws RemoteException {
+		return buildZona(origem, "Mao" + pname, new Integer[] { dono }, qntCartas,
+				VISIBILIDADE.PRIVADA, false);
 	}
 
-	public final Zona buildMesa(Zona origem, int qntCartas, IPlayer[] donos) {
+	public final Zona buildMesa(Zona origem, int qntCartas, Integer[] donos) {
 		return buildZona(origem, "Mesa", donos, qntCartas, VISIBILIDADE.PUBLICA, false);
 	}
 }

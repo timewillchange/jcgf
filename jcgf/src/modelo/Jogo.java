@@ -33,7 +33,7 @@ public abstract class Jogo {
 
 	protected abstract Zona defineDeck();
 
-	protected abstract List<Zona> defineZonas(List<IPlayer> players);
+	protected abstract List<Zona> defineZonas(Map<String, IPlayer> players);
 
 	public Jogo(/* Controle controle/* EstadoJogo estado */) {
 		// new Controle(this, estado);
@@ -44,7 +44,7 @@ public abstract class Jogo {
 	}
 
 	/**
-	 * Valida a ação de mover retornando msg de erro quando invalida. Pode ser
+	 * Valida a aï¿½ï¿½o de mover retornando msg de erro quando invalida. Pode ser
 	 * sobreescrito invocando o super para adicionar novas msgs.
 	 * 
 	 * @return Msg de erro mostrada ao user.
@@ -53,7 +53,7 @@ public abstract class Jogo {
 		List<Zona> origens = command.getOrigens();
 		Zona destino = command.getDestino();
 
-		String nomePlayer = Controle.nomePlayer;
+		//String nomePlayer = Controle.nomePlayer;
 		for (Zona origem : origens) {
 			if (origem == null) {
 				command.appendMsg("Zona origem nula\n");
@@ -62,18 +62,18 @@ public abstract class Jogo {
 				command.appendMsg("Zona destino nula\n");
 			}
 			if (origem.equals(destino)) {
-				command.appendMsg("Zona origem igual à destino: " + origem.getName() + "\n");
+				command.appendMsg("Zona origem igual ï¿½ destino: " + origem.getName() + "\n");
 			}
-			if (!origem.possuida(nomePlayer)) {// donos.contains(Player.getInstancia().getNome()))
-				command.appendMsg("Zona origem não pertence ao player: " + origem.getName() + "\n");
-			}
-			if (!destino.possuida(nomePlayer)) {
-				command.appendMsg("Zona destino não pertence ao player: " + destino.getName() + "\n");
-			}
-			if (!estado.getPlayerVez().equals(nomePlayer)) {
-				if (!((Player) players.get(estado.getPlayerVez())).getNomePlayer().equals(nomePlayer);
-				command.appendMsg("Não é sua vez\n");
-			}
+//			if (!origem.possuida(id)) {// donos.contains(Player.getInstancia().getNome()))
+//				command.appendMsg("Zona origem nï¿½o pertence ao player: " + origem.getName() + "\n");
+//			}
+//			if (!destino.possuida(id)) {
+//				command.appendMsg("Zona destino nï¿½o pertence ao player: " + destino.getName() + "\n");
+//			}
+//			if (estado.getPlayerVez()!=) {
+//				if (!((Player) players.get(estado.getPlayerVez())).getNomePlayer().equals(nomePlayer);
+//				command.appendMsg("Nï¿½o ï¿½ sua vez\n");
+//			}
 		}
 		command = aposValidaMove(command);
 		if (/* validar */true) {
@@ -142,9 +142,9 @@ public abstract class Jogo {
 	 * @param origens
 	 *            Zonas a serem movida.
 	 * @param destino
-	 *            Zona à qual a zona origem sera adicionada.
+	 *            Zona ï¿½ qual a zona origem sera adicionada.
 	 * @param validar
-	 *            Se deve validar a jogada. Caso a validação falhar não move.
+	 *            Se deve validar a jogada. Caso a validaï¿½ï¿½o falhar nï¿½o move.
 	 * @return Se moveu com sucesso.
 	 */
 	private final AbsCommand move(AbsCommand command) {
@@ -163,7 +163,7 @@ public abstract class Jogo {
 		return command;
 	}
 
-	public final void passaVez(/*List<IPlayer> players*/) {
+	public final void passaVez(/*Map<String, IPlayer> players*/) {
 		estado.setPlayerVez(nextPlayer(/*players*/));
 		estado.setMoveu(false);
 		setMemento();
@@ -180,13 +180,13 @@ public abstract class Jogo {
 	}
 
 	/**
-	 * Invocado pelo clique do botão, define o próximo jogador a jogar. Pode ser
+	 * Invocado pelo clique do botï¿½o, define o prï¿½ximo jogador a jogar. Pode ser
 	 * sobrescrito para definir uma ordem diferente de acordo com as regras do
 	 * jogo.
 	 * 
 	 * @return
 	 */
-	protected int nextPlayer(/* List<IPlayer> players */) {
+	protected int nextPlayer(/* Map<String, IPlayer> players */) {
 		// IPlayer next = null;
 		// String[] playerNames = estado.getPlayerNames();
 		// for (int i = 0; i < players.size(); i++) {
@@ -258,7 +258,7 @@ public abstract class Jogo {
 	 * @param playerNames
 	 * 
 	 */
-	public final EstadoJogo configuraEstado(List<IPlayer> players) {
+	public final EstadoJogo configuraEstado(Map<String, IPlayer> players) {
 		// Se atingiu numero de jogadores.
 		estado.setPlayerVez(0);
 		// estado.setPlayerNames(playerNames);
@@ -289,7 +289,7 @@ public abstract class Jogo {
 		return this.estado;
 	}
 	
-	public vez(){
+	public void vez(){
 		
 	}
 

@@ -10,15 +10,16 @@ import cgf.controle.Controle;
 import cgf.estado.EstadoJogo;
 
 /**
- * Classe de jogador remoto. Usa padrão Observer para conversar com os Players
+ * Classe de jogador remoto. Usa padrï¿½o Observer para conversar com os Players
  * cadastrados por RMI.
  * 
  * @author Zidane
  * 
  */
 public class Player extends UnicastRemoteObject implements IPlayer {
+	private int id;
 	// TODO public static ?
-	public String nomePlayer;
+	private String nomePlayer;
 
 	// private boolean changed = false;
 
@@ -46,5 +47,13 @@ public class Player extends UnicastRemoteObject implements IPlayer {
 			// controle.update(sender, valor);
 			controle.propertyChange(new PropertyChangeEvent(sender, "", null, valor));
 		}
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }
